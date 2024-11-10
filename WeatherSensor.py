@@ -25,7 +25,7 @@ class GeoCoordinate:
 def temperature_decorator(method):
     def wrapper(self):
         temperature = method(self)
-        return f'{temperature}º'
+        return f'{temperature}°'
     return wrapper
 
 

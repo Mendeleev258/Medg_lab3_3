@@ -1,0 +1,5 @@
+Longitude: 51.25.30.500
+Latitude: 39.41.48.191
+ID: WS_36_VSU
+Temperature: -2.0°
+Wetness: 46.2%

@@ -1,7 +1,8 @@
 # 9. Класс «Геокоордината» с полями «градусы», «минуты», «секунды», «доли секунд».
 # Класс «Метеодатчик» с полями «долгота» и «широта» (геокоординаты), «ID»,
 # «температура», «влажность». Декоратор превращает число-результат в строку,
-# добавляя символ «º». Декорировать геттер температуры.
+# добавляя символ «°». Декорировать геттер температуры.
+
 import WeatherSensor as ws
 
 def validation(x, condition, message):
@@ -32,7 +33,7 @@ def print_menu():
           f'3. Print latitude\n'
           f'4. Print ID\n'
           f'5. Print temperature\n'
-          f'6. Print wetness\n')
+          f'6. Print wetness')
     choice = 0
     choice = validation(choice, lambda x: (1 <= x <= 6) and (x % 1 == 0), '')
     return choice
@@ -67,7 +68,19 @@ def input_weather_data():
     wetness = 0
     wetness = validation(wetness, lambda x: -100 < x < 100, 'Enter wetness, %')
     return ws.WeatherSensor(longitude, latitude, id, temperature, wetness)
-2
+
+def read_weather_data(ws_dict):
+    lst = ws_dict['Longitude'].split('.')
+    longitude = ws.GeoCoordinate(lst[0], lst[1], lst[2], lst[3])
+
+    lst = ws_dict['Latitude'].split('.')
+    latitude = ws.GeoCoordinate(lst[0], lst[1], lst[2], lst[3])
+
+    id = ws_dict['ID']
+    temperature = float(ws_dict['Temperature'].strip('°'))
+    wetness = float(ws_dict['Wetness'].strip('%'))
+    return ws.WeatherSensor(longitude, latitude, id, temperature, wetness)
+
 
 exit_flag = False
 weather_data = ws.WeatherSensor()
@@ -77,7 +90,14 @@ while (not exit_flag):
         case 1:
             weather_data = input_weather_data()
         case 2:
-            pass
+            weather_data_dict = {}
+            with open('inp.txt', 'r', encoding='utf-8') as file:
+                for line in file:
+                    line = line.strip()
+                    key, value = line.split(':', 1)
+                    weather_data_dict[key.strip()] = value.strip()
+            weather_data = read_weather_data(weather_data_dict)
+            print('Succsessfully read from "inp.txt"')
         case 3:
             if (not weather_data.is_empty()):
                 choice_print = print_menu()
@@ -96,6 +116,23 @@ while (not exit_flag):
                         print(f'{weather_data.wetness} %')
             else: print('No data')
         case 4:
-            pass
+            if (not weather_data.is_empty()):
+                with open('out.txt', 'w', encoding='utf-8') as out_file:
+                    choice_print = print_menu()
+                    match choice_print:
+                        case 1:
+                            print(weather_data, file=out_file)
+                        case 2:
+                            print(weather_data.longitude, file=out_file)
+                        case 3:
+                            print(weather_data.latitude, file=out_file)
+                        case 4:
+                            print(weather_data.id, file=out_file)
+                        case 5:
+                            print(weather_data.temperature, file=out_file)
+                        case 6:
+                            print(f'{weather_data.wetness} %', file=out_file)
+                print('Successfully printed to file "out.txt"')
+            else: print('No data')
         case 5:
             exit_flag = True
